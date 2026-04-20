@@ -2,10 +2,10 @@
 
 /* appearance */
 static const unsigned int borderpx  = 0;        /* border pixel of windows */
-static const unsigned int gappih    = 8;        /* horiz inner gap between windows */
-static const unsigned int gappiv    = 8;        /* vert inner gap between windows */
-static const unsigned int gappoh    = 8;        /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 8;        /* vert outer gap between windows and screen edge */
+static const unsigned int gappih    = 12;        /* horiz inner gap between windows */
+static const unsigned int gappiv    = 12;        /* vert inner gap between windows */
+static const unsigned int gappoh    = 12;        /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 12;        /* vert outer gap between windows and screen edge */
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -91,10 +91,10 @@ static const int lockfullscreen = 1;
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
+    { "[\\]",     dwindle },
 	{ "[]=",      tile },
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
-	{ "[\\]",     dwindle },
 	{ "H[]",      deck },
 	{ "TTT",      bstack },
 	{ "===",      bstackhoriz },
@@ -121,6 +121,7 @@ static const Layout layouts[] = {
 /* commands  */
 static char dmenumon[2] = "0";
 static const char *dmenucmd[]      = { "rofi", "-show", "drun", NULL };
+static const char *emojicmd[]      = { "rofi", "-modi emoji", "-show", "emoji", NULL };
 static const char *termcmd[]       = { "st", NULL };
 static const char *browsercmd[]    = { "firefox", NULL };
 static const char *filecmd[]       = { "pcmanfm", NULL };
@@ -145,6 +146,7 @@ static const Key keys[] = {
 	/* applications */
 	{ MODKEY,                       XK_x,               spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_r,               spawn,          {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_m,               spawn,          {.v = emojicmd } },
 	{ MODKEY,                       XK_b,               spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_e,               spawn,          {.v = filecmd } },
 	{ MODKEY,                       XK_p,               spawn,          {.v = scrcmd } },
