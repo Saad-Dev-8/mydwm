@@ -1,0 +1,98 @@
+# betterlockscreen configuration
+# Nord Theme
+# RGBA hex format: RRGGBBAA
+
+# ============================================================
+# Core Settings
+# ============================================================
+
+# Display to draw login box on (0 = all displays)
+display_on=0
+
+# Scale image to span multiple displays
+span_image=false
+
+# Effects to generate (space separated)
+# Available: dim blur dimblur pixel dimpixel color
+fx_list=(dim blur dimblur pixel dimpixel)
+
+# Effect intensity settings
+dim_level=40
+blur_level=1
+pixel_scale="10,1000"
+
+# Lock timeout in seconds
+lock_timeout=300
+
+# Suppress text output
+quiet=false
+
+# ============================================================
+# Theme Configuration - Nord Colors
+# ============================================================
+
+# Login Box
+loginbox="2e3440cc"        # nord0 with 80% opacity
+loginshadow="00000000"      # transparent
+
+# Text Elements
+font="JetBrains Mono"
+
+# Time (nord8 - light blue)
+timecolor="88c0d0ff"
+time_format="%I:%M %p"
+
+# Date (nord4 - light gray)
+datecolor="d8dee9ff"
+date_format="%A, %B %d"
+
+# Greeter/Instruction text (nord4)
+greetercolor="d8dee9ff"
+greetertext="Type password to unlock..."
+
+# Layout indicator (nord8)
+layoutcolor="88c0d0ff"
+
+# Verification
+veriftext="Verifying..."
+verifcolor="88c0d0ff"
+wrongtext="Wrong!"
+wrongcolor="bf616aff"      # nord11 - red
+locktext="Locking..."
+lockfailedtext="Lock Failed"
+
+# ============================================================
+# Password Ring Colors - Nord Theme
+# ============================================================
+
+# Normal state (unselected)
+ringcolor="88c0d0ff"        # nord8 - light blue
+insidecolor="00000000"      # transparent
+separatorcolor="00000000"   # transparent
+
+# Verifying state
+ringvercolor="a3be8cff"     # nord14 - green
+insidevercolor="00000000"   # transparent
+
+# Wrong password state
+ringwrongcolor="bf616aff"   # nord11 - red
+insidewrongcolor="bf616a33" # nord11 with 20% opacity
+
+# Key highlights
+keyhlcolor="ebcb8bff"       # nord13 - yellow
+bshlcolor="d08770ff"        # nord12 - orange
+modifcolor="b48eadff"       # nord15 - purple
+
+# Background color (fallback)
+bgcolor="2e3440ff"          # nord0 - dark
+
+# ============================================================
+# Advanced Settings
+# ============================================================
+
+# Custom i3lock arguments (advanced)
+# lockargs=(
+#     --radius 150
+#     --ring-width 8
+# )
+

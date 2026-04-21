@@ -1,0 +1,104 @@
+* {
+    /* Nord colors */
+    background: #2e3440;
+    foreground: #d8dee9;
+    bg-selected: #88c0d0;
+    grey: #4c566a;
+    
+    /* Spacing */
+    spacing: 4;
+    margin: 0;
+    padding: 0;
+    
+    /* Font - JetBrains Mono (more common) */
+    font: "JetBrains Mono 12";
+}
+
+#window {
+    background-color: @background;
+    border-radius: 16px;
+    padding: 20px;
+    width: 600px;
+    location: center;
+    anchor: center;
+}
+
+#mainbox {
+    background-color: @background;
+    spacing: 15px;
+    padding: 0;
+}
+
+#inputbar {
+    background-color: @background;
+    border-radius: 8px;
+    padding: 8px 12px;
+    children: [prompt, entry];
+    background-color: #3b4252;  /* Slightly lighter background for input */
+}
+
+#prompt {
+    background-color: inherit;
+    text-color: @bg-selected;
+    font: "JetBrains Mono 14";
+    padding: 0 4px;
+    margin: 0 5px 0 0;
+    str: "";  /* Search icon */
+}
+
+#entry {
+    background-color: inherit;
+    text-color: @foreground;
+    placeholder: "Search applications...";
+    placeholder-color: @grey;
+    font: "JetBrains Mono 14";
+    expand: true;
+}
+
+#listview {
+    background-color: @background;
+    spacing: 2px;
+    lines: 10;
+    scrollbar: true;
+    scrollbar-width: 4px;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+#element {
+    background-color: @background;
+    text-color: @foreground;
+    padding: 8px 12px;
+    border-radius: 6px;
+    spacing: 10px;
+}
+
+#element selected {
+    background-color: @bg-selected;
+    text-color: @background;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+    font: "JetBrains Mono 12";
+}
+
+element-icon {
+    background-color: inherit;
+    margin: 0 8px 0 0;
+    size: 24px;
+}
+
+#scrollbar {
+    background-color: #3b4252;
+    width: 4px;
+    border-radius: 2px;
+}
+
+#scrollbar handle {
+    background-color: @bg-selected;
+    width: 4px;
+    border-radius: 2px;
+    min-height: 20px;
+}
