@@ -35,9 +35,9 @@ dwm with patches for a better experience.
 - polybar
 
 ## Install
+You can use install script with:
 ```bash
-git clone https://github.com/Saad-Dev-8/mydwm
 cd mydwm
-sudo make clean install
+chmod +x install.sh
+./install.sh
 ```
-
