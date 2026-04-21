@@ -55,14 +55,14 @@ static const Rule rules[] = {
 	{ "Pcmanfm",          NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "Pavucontrol",      NULL,     NULL,           0,         1,          0,           0,        -1 },
 	{ "Lxappearance",     NULL,     NULL,           0,         0,          0,           0,        -1 },
-	{ "nmtui-floating",   NULL,     NULL,           0,         1,          1,           0,        -1 },
+	{ "nmtui-floating",   NULL,     NULL,           0,         1,          0,           1,        -1 },
 	{ "Gimp",             NULL,     NULL,           0,         1,          0,           0,        -1 },
 	{ NULL,               NULL,     "Event Tester", 0,         0,          0,           1,        -1 },
 };
 
 /* IPC */
 static const char *ipcsockpath = "/tmp/dwm.sock";
-static const IPCCommand ipccommands[] = {
+static IPCCommand ipccommands[] = {
   IPCCOMMAND( view,         1, {ARG_TYPE_UINT}   ),
   IPCCOMMAND( toggleview,   1, {ARG_TYPE_UINT}   ),
   IPCCOMMAND( tag,          1, {ARG_TYPE_UINT}   ),

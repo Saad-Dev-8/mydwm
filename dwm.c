@@ -1398,6 +1398,15 @@ manage(Window w, XWindowAttributes *wa)
 		c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
 	}
 
+    if (!strcmp(c->name, "gazelle")) {
+        c->isfloating = 1;
+        c->w = 950;
+        c->h = 600;
+        c->x = c->mon->wx + (c->mon->ww / 2 - 950 / 2);
+        c->y = c->mon->wy + (c->mon->wh / 2 - 600 / 2);
+        XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
+    }
+
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
