@@ -1,10 +1,7 @@
 #!/bin/bash
-# mydwm install script
-# installs dwm, configs and dependencies
 
 set -e
 
-# colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -28,29 +25,24 @@ echo -e "${NC}"
 
 # detect distro family
 detect_distro() {
-    # check /etc/os-release for ID and ID_LIKE fields
     if [ -f /etc/os-release ]; then
         . /etc/os-release
 
-        # check if it's arch or arch-based (manjaro, endeavouros, garuda, etc)
         if [ "$ID" = "arch" ] || echo "${ID_LIKE:-}" | grep -qw "arch"; then
             echo "arch"
             return
         fi
 
-        # check if it's debian or debian-based (ubuntu, mint, pop, etc)
         if [ "$ID" = "debian" ] || echo "${ID_LIKE:-}" | grep -qw "debian"; then
             echo "debian"
             return
         fi
 
-        # check if it's ubuntu-based (ubuntu itself has ID=ubuntu not ID_LIKE=debian)
         if [ "$ID" = "ubuntu" ] || echo "${ID_LIKE:-}" | grep -qw "ubuntu"; then
             echo "debian"
             return
         fi
 
-        # fedora or fedora-based (nobara, ultramarine, etc)
         if [ "$ID" = "fedora" ] || echo "${ID_LIKE:-}" | grep -qw "fedora"; then
             echo "fedora"
             return
@@ -172,7 +164,6 @@ install_dwm() {
 install_configs() {
     info "Installing config files..."
 
-    # create config dirs if they don't exist
     mkdir -p ~/.config/picom
     mkdir -p ~/.config/dunst
     mkdir -p ~/.config/polybar
@@ -262,9 +253,7 @@ setup_wallpapers() {
     fi
 }
 
-# main
 main() {
-    # ask what to install
     echo ""
     echo "What would you like to install?"
     echo "  1) Everything (recommended)"
