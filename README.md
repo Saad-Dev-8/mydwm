@@ -18,6 +18,7 @@ dwm with patches for a better experience.
 - cyclelayouts
 - savefloats
 - statusallmons
+- ewmhtags
 - systray
 - ipc
 
