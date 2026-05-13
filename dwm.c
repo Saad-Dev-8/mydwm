@@ -1398,6 +1398,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->bw = borderpx;
 
 	selmon->tagset[selmon->seltags] &= ~scratchtag;
+	/* scratchpad */
 	if (!strcmp(c->name, scratchpadname)) {
 		c->mon->tagset[c->mon->seltags] |= c->tags = scratchtag;
 		c->isfloating = True;
@@ -1405,14 +1406,14 @@ manage(Window w, XWindowAttributes *wa)
 		c->y = c->mon->wy + (c->mon->wh / 2 - HEIGHT(c) / 2);
 	}
 
-    if (!strcmp(c->name, "gazelle")) {
-        c->isfloating = 1;
-        c->w = 950;
-        c->h = 600;
-        c->x = c->mon->wx + (c->mon->ww / 2 - 950 / 2);
-        c->y = c->mon->wy + (c->mon->wh / 2 - 600 / 2);
-        XMoveResizeWindow(dpy, c->win, c->x, c->y, c->w, c->h);
-    }
+	/* nmtui-floating */
+	if (!strcmp(c->name, "gazelle")) {
+		c->isfloating = 1;
+		c->w = 950;
+		c->h = 600;
+		c->x = c->mon->wx + (c->mon->ww / 2 - 950 / 2);
+		c->y = c->mon->wy + (c->mon->wh / 2 - 600 / 2);
+	}
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
@@ -1431,7 +1432,7 @@ manage(Window w, XWindowAttributes *wa)
 		c->isfloating = c->oldstate = trans != None || c->isfixed;
 	if (c->isfloating)
 		XRaiseWindow(dpy, c->win);
-	if( attachbelow )
+	if (attachbelow)
 		attachBelow(c);
 	else
 		attach(c);
@@ -1446,7 +1447,7 @@ manage(Window w, XWindowAttributes *wa)
 	arrange(c->mon);
 	XMapWindow(dpy, c->win);
 	updatewindowdesktop(c);
-    if (term)
+	if (term)
 		swallow(term, c);
 	focus(NULL);
 }
