@@ -2349,12 +2349,17 @@ togglefloating(const Arg *arg)
 	if (selmon->sel->isfullscreen) /* no support for fullscreen windows */
 		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
-	if (selmon->sel->isfloating)
-		/* restore last known float dimensions */
-		resize(selmon->sel, selmon->sel->sfx, selmon->sel->sfy,
-		       selmon->sel->sfw, selmon->sel->sfh, False);
-	else {
-		/* save last known float dimensions */
+	if (selmon->sel->isfloating) {
+		/* center window when toggling to floating */
+        int w = selmon->sel->mon->ww * 0.5;
+        int h = selmon->sel->mon->wh * 0.6;
+        selmon->sel->w = w;
+        selmon->sel->h = h;
+        selmon->sel->x = selmon->sel->mon->wx + (selmon->sel->mon->ww / 2 - w / 2);
+        selmon->sel->y = selmon->sel->mon->wy + (selmon->sel->mon->wh / 2 - h / 2);
+        XMoveResizeWindow(dpy, selmon->sel->win, selmon->sel->x, selmon->sel->y, w, h);
+	} else {
+		/* save last known float dimensions when going back to tiled */
 		selmon->sel->sfx = selmon->sel->x;
 		selmon->sel->sfy = selmon->sel->y;
 		selmon->sel->sfw = selmon->sel->w;
