@@ -47,7 +47,7 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class              instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-	{ "Polybar",          NULL,     NULL,           0,         1,          0,           1,        -1 },
+	// { "Polybar",          NULL,     NULL,           0,         0,          0,           1,        -1 },
     { "St",               NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ "firefox",          NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "Firefox",          NULL,     NULL,           0,         0,          0,           0,        -1 },
@@ -103,6 +103,7 @@ static const Layout layouts[] = {
 	{ ":::",      gaplessgrid },
 	{ "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
+    { "###",      nrowgrid },
 	{ "><>",      NULL },
 	{ NULL,       NULL },
 };
@@ -120,7 +121,7 @@ static const Layout layouts[] = {
 /* commands  */
 static char dmenumon[2] = "0";
 static const char *dmenucmd[]      = { "rofi", "-show", "drun", NULL };
-static const char *emojicmd[]      = { "rofi", "-modi emoji", "-show", "emoji", NULL };
+static const char *emojicmd[]      = { "rofi", "-modi", "emoji", "-show", "emoji", NULL };
 static const char *keybindscmd[]   = { "/bin/sh", "-c", "$HOME/Projects/mydwm/scripts/dwm-keybinds.sh", NULL };
 static const char *termcmd[]       = { "st", NULL };
 static const char *browsercmd[]    = { "firefox", NULL };
@@ -175,7 +176,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_Right,           focusstack,     {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_Left,            movestack,      {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_Right,           movestack,      {.i = +1 } },
-	{ MODKEY,                       XK_h,               setmfact,       {.f = -0.05} },
+	{ MODKEY|ControlMask,           XK_t,               setlayoutsafe,  {.v = &layouts[0]} },
+    { MODKEY,                       XK_h,               setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,               setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_i,               incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,               incnmaster,     {.i = -1 } },
