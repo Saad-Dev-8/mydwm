@@ -4,7 +4,6 @@
 # Requires: nmcli (NetworkManager), Nerd Fonts patched font
 # Polybar module must use: tail = true
 
-# ── Help ──────────────────────────────────────────────────────────────────────
 usage() {
     cat << EOF
 Usage: $(basename "$0") [OPTIONS]
@@ -45,7 +44,6 @@ EOF
     exit 0
 }
 
-# ── Configuration (override with flags or edit directly) ─────────────────────
 WIFI_IFACE=""        # auto-detected if empty
 ETH_IFACE=""         # auto-detected if empty
 ENABLE_WIFI=true
@@ -61,11 +59,10 @@ C_SPINNER="#ebcb8b"
 C_ERROR="#bf616a"
 C_RESET="%{F-}"
 
-# Nerd Font arc spinner frames
+# Arc spinner frames
 SPINNER_FRAMES=("󰪞" "󰪟" "󰪠" "󰪡" "󰪢" "󰪣" "󰪤" "󰪥")
 SPINNER_COUNT=${#SPINNER_FRAMES[@]}
 
-# ── Argument Parsing ──────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help)        usage ;;
@@ -80,7 +77,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# ── Interface Auto-Detection ──────────────────────────────────────────────────
 if $ENABLE_WIFI; then
     if [ -z "$WIFI_IFACE" ] || [ ! -d "/sys/class/net/$WIFI_IFACE" ]; then
         WIFI_IFACE=$(ls /sys/class/net/ 2>/dev/null | grep -E '^wl' | head -1)
@@ -104,7 +100,6 @@ if ! $ENABLE_WIFI && ! $ENABLE_ETH; then
     exit 1
 fi
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
 get_wifi_info() {
     local line
     line=$(nmcli -t -f SSID,SIGNAL,ACTIVE device wifi list ifname "$WIFI_IFACE" 2>/dev/null \
@@ -135,7 +130,6 @@ signal_icon() {
     fi
 }
 
-# ── Render Functions ──────────────────────────────────────────────────────────
 LAST_WIFI_LABEL=""
 LAST_ETH_LABEL=""
 
@@ -151,7 +145,6 @@ render_wifi() {
         signal=50
     fi
 
-    # Retry once if NM hasn't updated its wifi list yet
     if [ -z "$ssid" ]; then
         sleep 0.5
         info=$(get_wifi_info)
@@ -192,7 +185,6 @@ render_eth() {
     print_output "%{F${C_ETH}}󰈀${label}${C_RESET}"
 }
 
-# ── Output Routing ────────────────────────────────────────────────────────────
 # Tracks last printed line per interface so we can combine WiFi + Ethernet
 # into a single bar output without one overwriting the other.
 LAST_WIFI_OUT=""
@@ -231,7 +223,6 @@ _flush_output() {
     echo "$combined"
 }
 
-# ── Spinner ───────────────────────────────────────────────────────────────────
 SPINNER_PID=""
 SPINNER_FLAG="/tmp/polybar-network-spinner-$$"
 
@@ -267,7 +258,6 @@ start_spinner() {
     SPINNER_PID=$!
 }
 
-# ── Signal refresh ────────────────────────────────────────────────────────────
 REFRESH_PID=""
 
 start_signal_refresh() {
@@ -311,13 +301,11 @@ render_eth_direct() {
     emit_eth "%{F${C_ETH}}󰈀${label}${C_RESET}"
 }
 
-# ── Parse state from nmcli monitor event line ─────────────────────────────────
 parse_event_state() {
     local iface="$1" event="$2"
     echo "$event" | sed "s/^${iface}: //" | awk '{print $1}'
 }
 
-# ── Handle state ──────────────────────────────────────────────────────────────
 handle_wifi_state() {
     local state="$1"
     case "$state" in
@@ -369,7 +357,6 @@ handle_eth_state() {
     esac
 }
 
-# ── Cleanup ───────────────────────────────────────────────────────────────────
 MONITOR_PID=""
 
 cleanup() {
@@ -382,7 +369,6 @@ cleanup() {
 
 trap cleanup EXIT INT TERM HUP
 
-# ── Startup ───────────────────────────────────────────────────────────────────
 if $ENABLE_ETH; then
     ETH_STATE=$(nmcli -t -f DEVICE,STATE device status 2>/dev/null \
         | grep "^${ETH_IFACE}:" | cut -d: -f2)
@@ -397,7 +383,6 @@ fi
 
 start_signal_refresh
 
-# ── Event loop with NM watchdog ───────────────────────────────────────────────
 while true; do
     coproc MONITOR { nmcli monitor 2>/dev/null; }
     MONITOR_PID=$!
