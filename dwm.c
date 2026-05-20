@@ -762,7 +762,6 @@ clientmessage(XEvent *e)
 		}
 		return;
 	}
-
 	if (!c)
 		return;
 	if (cme->message_type == netatom[NetWMState]) {
@@ -771,8 +770,17 @@ clientmessage(XEvent *e)
 			setfullscreen(c, (cme->data.l[0] == 1 /* _NET_WM_STATE_ADD    */
 				|| (cme->data.l[0] == 2 /* _NET_WM_STATE_TOGGLE */ && !c->isfullscreen)));
 	} else if (cme->message_type == netatom[NetActiveWindow]) {
-		if (c != selmon->sel && !c->isurgent)
+		if (c && c->mon == selmon) {
+			unsigned int newtags = c->tags & TAGMASK;
+			if (newtags) {
+				selmon->tagset[selmon->seltags] = newtags;
+				focus(c);
+				arrange(selmon);
+				updatecurrentdesktop();
+			}
+		} else if (c && !c->isurgent) {
 			seturgent(c, 1);
+		}
 	}
 }
 
