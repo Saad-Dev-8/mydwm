@@ -22,6 +22,13 @@ dwm with patches for a better experience.
 - systray
 - ipc
 
+## Screenshots
+
+![Desktop](screenshots/dwm.png)
+![Tiling](screenshots/tiling.png)
+![Bar](screenshots/bar.png)
+![Rofi](screenshots/rofi.png)
+
 ## Dependencies
 - libx11
 - libxft

@@ -134,6 +134,7 @@ static const char *voltogcmd[]     = { "pamixer", "-t", NULL };
 static const char *brupcmd[]       = { "brightnessctl", "-d", "amdgpu_bl1", "set", "+5%", NULL };
 static const char *brdowncmd[]     = { "brightnessctl", "-d", "amdgpu_bl1", "set", "5%-", NULL };
 static const char *wallcmd[]       = { "/bin/sh", "-c", "feh --randomize --bg-fill ~/Pictures/Wallpapers/*", NULL };
+static const char *lockcmd[]       = { "betterlockscreen", "-l", NULL };
 static const char *powercmd[]      = { "/bin/sh", "-c", "~/.config/rofi/powermenu.sh", NULL };
 
 static const char scratchpadname[] = "scratchpad";
@@ -186,7 +187,8 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_space,           togglefloating, {0} },
 	{ MODKEY,                       XK_f,               togglefullscr,  {0} },
 
-	/* exit */
+	/* exit and lock */
+    { MODKEY|ShiftMask,             XK_l,               spawn,          {.v = lockcmd } },
 	{ MODKEY|ShiftMask,             XK_e,               quit,           {0} },
 
 	/* layouts */
