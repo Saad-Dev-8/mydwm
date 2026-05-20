@@ -23,10 +23,13 @@ dwm with patches for a better experience.
 - ipc
 
 ## Screenshots
-
+- dwm
 ![Desktop](screenshots/dwm.png)
+- Tiling
 ![Tiling](screenshots/tiling.png)
+- Polybar
 ![Bar](screenshots/bar.png)
+- Rofi
 ![Rofi](screenshots/rofi.png)
 
 ## Dependencies
