@@ -121,9 +121,11 @@ static const Layout layouts[] = {
 /* commands  */
 static char dmenumon[2] = "0";
 static const char *dmenucmd[]      = { "rofi", "-show", "drun", NULL };
+static const char *windowcmd[]     = { "rofi", "-show", "window", NULL };
 static const char *emojicmd[]      = { "rofi", "-modi", "emoji", "-show", "emoji", NULL };
 static const char *keybindscmd[]   = { "/bin/sh", "-c", "$HOME/Projects/mydwm/scripts/dwm-keybinds.sh", NULL };
 static const char *termcmd[]       = { "st", NULL };
+static const char *nmuicmd[]       = { "st", "-c", "nmtui-floating", "-e", "gazelle", NULL };
 static const char *browsercmd[]    = { "firefox", NULL };
 static const char *filecmd[]       = { "pcmanfm", NULL };
 static const char *scrcmd[]        = { "flameshot", "gui", NULL };
@@ -148,7 +150,9 @@ static const Key keys[] = {
 	/* applications */
 	{ MODKEY,                       XK_x,               spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_r,               spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_m,               spawn,          {.v = emojicmd } },
+	{ MODKEY,                       XK_w,               spawn,          {.v = windowcmd } },
+    { MODKEY|ShiftMask,             XK_m,               spawn,          {.v = emojicmd } },
+    { MODKEY,                       XK_n,               spawn,          {.v = nmuicmd } },
 	{ MODKEY,                       XK_slash,           spawn,          {.v = keybindscmd } },
 	{ MODKEY,                       XK_b,               spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_e,               spawn,          {.v = filecmd } },
