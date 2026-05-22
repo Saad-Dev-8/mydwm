@@ -68,7 +68,7 @@ info "Detected: ${PRETTY_NAME:-$DISTRO} (family: $DISTRO)"
 # detect xorg or xlibre
 detect_xserver() {
     # check if xlibre is installed (fork of xorg)
-    if pacman -Qi xlibre-server &>/dev/null 2>&1 || \
+    if pacman -Qi xlibre-xserver &>/dev/null 2>&1 || \
        pacman -Qi xlibre &>/dev/null 2>&1; then
         echo "xlibre"
         return
