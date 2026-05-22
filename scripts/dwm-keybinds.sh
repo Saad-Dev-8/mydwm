@@ -9,7 +9,9 @@ Super + x                    Terminal  (st)
 Super + r                    App Launcher  (rofi)
 Super + b                    Browser   (firefox)
 Super + e                    File Manager   (pcmanfm)
+Super + w                    Window Switcher 󱂬  (rofi)
 Super + p                    Screenshot  (flameshot)
+Super + n                    Gazelle Menu 󰒍
 Super + Shift + p             Fullscreen Screenshot 
 Super + Shift + w             Random Wallpaper 󰸉
 Super + grave                Scratchpad Terminal 
@@ -82,6 +84,7 @@ XF86MonBrightnessDown        Brightness Down 5%
 # ──────────────────────────────────────
 #  DWM
 # ──────────────────────────────────────
+Super + Shfit + l            Lock dwm 
 Super + Shift + e            Exit dwm 󰩈
 "
 

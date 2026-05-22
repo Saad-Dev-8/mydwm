@@ -65,9 +65,83 @@ DISTRO=$(detect_distro)
 PRETTY_NAME=$(grep "^PRETTY_NAME" /etc/os-release 2>/dev/null | cut -d= -f2 | tr -d '"')
 info "Detected: ${PRETTY_NAME:-$DISTRO} (family: $DISTRO)"
 
+# detect xorg or xlibre
+detect_xserver() {
+    # check if xlibre is installed (fork of xorg)
+    if pacman -Qi xlibre-server &>/dev/null 2>&1 || \
+       pacman -Qi xlibre &>/dev/null 2>&1; then
+        echo "xlibre"
+        return
+    fi
+
+    # check if xorg is installed
+    if pacman -Qi xorg-server &>/dev/null 2>&1 || \
+       dpkg -l xserver-xorg &>/dev/null 2>&1 || \
+       rpm -q xorg-x11-server-Xorg &>/dev/null 2>&1; then
+        echo "xorg"
+        return
+    fi
+
+    # check running display server via xdpyinfo
+    if [ -n "$DISPLAY" ]; then
+        local server
+        server=$(xdpyinfo 2>/dev/null | grep "X.Org\|XLibre" | head -1)
+        if echo "$server" | grep -qi "xlibre"; then
+            echo "xlibre"
+            return
+        elif echo "$server" | grep -qi "x.org"; then
+            echo "xorg"
+            return
+        fi
+    fi
+
+    echo "none"
+}
+
+XSERVER=$(detect_xserver)
+case $XSERVER in
+    xlibre)  info "X server: XLibre detected" ;;
+    xorg)    info "X server: Xorg detected" ;;
+    none)    warning "No X server detected — will install xorg" ;;
+esac
+
+# install xorg if no x server detected
+install_xorg() {
+    if [ "$XSERVER" = "none" ]; then
+        info "Installing Xorg..."
+        case $DISTRO in
+            arch)
+                sudo pacman -S --needed --noconfirm \
+                    xorg-server \
+                    xorg-xinit \
+                    xorg-xrandr \
+                    xorg-xsetroot
+                ;;
+            debian)
+                sudo apt install -y \
+                    xserver-xorg \
+                    xinit \
+                    x11-xserver-utils
+                ;;
+            fedora)
+                sudo dnf install -y \
+                    xorg-x11-server-Xorg \
+                    xorg-x11-xinit \
+                    xorg-x11-utils
+                ;;
+        esac
+        success "Xorg installed"
+    else
+        info "Skipping Xorg install — $XSERVER already present"
+    fi
+}
+
 # install dependencies
 install_deps() {
     info "Installing dependencies..."
+
+    # install xorg if needed
+    install_xorg
 
     case $DISTRO in
         arch)
