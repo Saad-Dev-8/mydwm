@@ -53,6 +53,9 @@ chmod +x install.sh
 ./install.sh
 ```
 
+## Theme Switcher (Beta)
+Theme switcher is also available but it is in test so if you want to try it out change the branch to theme-switcher
+
 ## ⌨️ Keybindings
 
 Press <kbd>SUPER</kbd> + <kbd>/</kbd> inside of dwm for an **interactive keybind viewer**.
