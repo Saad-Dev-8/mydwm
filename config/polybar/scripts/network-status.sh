@@ -52,11 +52,23 @@ MAX_SSID_LEN=20
 SPINNER_INTERVAL=0.15
 SIGNAL_REFRESH=30
 
-# Colours
-C_WIFI="#88c0d0"
-C_ETH="#a3be8c"
-C_SPINNER="#ebcb8b"
-C_ERROR="#bf616a"
+# Colours - read from polybar config
+POLYBAR_CONFIG="$HOME/.config/polybar/config.ini"
+
+read_color() {
+    grep "^$1 " "$POLYBAR_CONFIG" 2>/dev/null | awk '{print $3}' | head -1
+}
+
+C_WIFI=$(read_color "accent-alt")
+C_ETH=$(read_color "success")
+C_SPINNER=$(read_color "info")
+C_ERROR=$(read_color "urgent")
+
+# fallback to Nord if polybar config not found
+C_WIFI="${C_WIFI:-#88c0d0}"
+C_ETH="${C_ETH:-#a3be8c}"
+C_SPINNER="${C_SPINNER:-#ebcb8b}"
+C_ERROR="${C_ERROR:-#bf616a}"
 C_RESET="%{F-}"
 
 # Arc spinner frames
