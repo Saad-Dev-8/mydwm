@@ -12,9 +12,10 @@ Super + e                    File Manager   (pcmanfm)
 Super + w                    Window Switcher 󱂬  (rofi)
 Super + p                    Screenshot  (flameshot)
 Super + n                    Gazelle Menu 󰒍
-Super + Shift + p             Fullscreen Screenshot 
-Super + Shift + w             Random Wallpaper 󰸉
+Super + Shift + p            Fullscreen Screenshot 
+Super + Shift + w            Random Wallpaper 󰸉
 Super + grave                Scratchpad Terminal 
+Super + Shift + t            Theme Switcher
 Super + Ctrl + q             Power Menu 󰐥
 
 # ──────────────────────────────────────
