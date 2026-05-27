@@ -10,7 +10,7 @@
     margin: 0;
     padding: 0;
     
-    /* Font - JetBrains Mono (more common) */
+    /* Font */
     font: "JetBrains Mono 12";
 }
 
@@ -34,7 +34,7 @@
     border-radius: 8px;
     padding: 8px 12px;
     children: [prompt, entry];
-    background-color: #3b4252;  /* Slightly lighter background for input */
+    background-color: #3b4252;
 }
 
 #prompt {
@@ -43,13 +43,12 @@
     font: "JetBrains Mono 14";
     padding: 0 4px;
     margin: 0 5px 0 0;
-    str: "";  /* Search icon */
+    str: ""; 
 }
 
 #entry {
     background-color: inherit;
     text-color: @foreground;
-    placeholder: "Search applications...";
     placeholder-color: @grey;
     font: "JetBrains Mono 14";
     expand: true;
@@ -97,7 +96,7 @@ element-icon {
 }
 
 #scrollbar handle {
-    background-color: @bg-selected;
+    background-color: #88c0d0; /* handle */
     width: 4px;
     border-radius: 2px;
     min-height: 20px;
