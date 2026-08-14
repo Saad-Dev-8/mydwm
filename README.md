@@ -53,17 +53,6 @@ chmod +x install.sh
 ./install.sh
 ```
 
-## Theme Switcher
-Available themes are:
-- Nord (Default)
-- Gruvbox
-- Catppuccin Mocha
-- Tokyonight
-- Rosepine
-- Breeze Dark
-
-You can change theme by pressing <kbd>SUPER</kbd> + <kbd>t</kbd>
-
 ## ⌨️ Keybindings
 
 Press <kbd>SUPER</kbd> + <kbd>/</kbd> inside of dwm for an **interactive keybind viewer**.
