@@ -3,7 +3,7 @@
  * Author : Aditya Shakya (adi1090x)
  * Github : @adi1090x
  *
- * Rofi Theme File
+ * Rofi Theme File - Horizontal Powermenu Card (Nord Theme - Perfect Circles)
  * Rofi Version: 1.7.3
  **/
 
@@ -12,111 +12,91 @@ configuration {
     show-icons:                 false;
 }
 
-/*****----- Global Properties -----*****/
+/*****----- Global Properties (Nord Palette) -----*****/
 * {
-    /* Resolution : 1366x768 */
-    mainbox-spacing:             70px;
-    mainbox-margin:              105px 280px;
-    message-margin:              0px 250px;
-    message-padding:             10px;
-    message-border-radius:       10px;
-    listview-spacing:            35px;
-    element-padding:             25px 30px;
-    element-border-radius:       15px;
+    font:                        "MesloLGS Nerd Font 10";
+    element-text-font:           "feather 28";
 
-    prompt-font:                 "MesloLGS Nerd Font Bold 52";
-    textbox-font:                "MesloLGS Nerd Font 10";
-    element-text-font:           "feather 46";
+    /* Nord Colors */
+    background-window:           #2E3440; /* nord0: Polar Night Dark */
+    background-element:          #3B4252; /* nord1: Polar Night Card */
+    background-selected:         #88C0D0; /* nord8: Frost Cyan Accent */
 
-    background-window:           black/30%;
-    background-normal:           white/5%;
-    background-selected:         white/15%;
-    foreground-normal:           white;
-    foreground-selected:         white;
+    foreground-normal:           #D8DEE9; /* nord4: Snow Storm White */
+    foreground-selected:         #2E3440; /* nord0: Polar Night Dark */
+
+    accent-color:                #88C0D0; /* nord8: Frost Cyan */
 }
 
 /*****----- Main Window -----*****/
 window {
     transparency:                "real";
-    location:                    center;
-    anchor:                      center;
-    fullscreen:                  true;
-    cursor:                      "default";
+    location:                    south;
+    anchor:                      south;
+    fullscreen:                  false;
+    width:                       510px; /* Calibrated so 5 columns equal 80px wide each */
+    x-offset:                    0px;
+    y-offset:                    -20px;
+
+    padding:                     25px;
     background-color:            var(background-window);
+    border-radius:               0px; /* Sharp square outer window container */
 }
 
 /*****----- Main Box -----*****/
 mainbox {
     enabled:                     true;
-    spacing:                     var(mainbox-spacing);
-    margin:                      var(mainbox-margin);
+    orientation:                 vertical;
+    spacing:                     15px;
     background-color:            transparent;
-    children:                    [ "dummy", "inputbar", "listview", "message", "dummy" ];
+    children:                    [ "message", "listview" ];
 }
 
-/*****----- Inputbar -----*****/
-inputbar {
-    enabled:                     true;
-    background-color:            transparent;
-    children:                    [ "dummy", "prompt", "dummy"];
-}
-
-dummy {
-    background-color:            transparent;
-}
-
-prompt {
-    enabled:                     true;
-    font:                        var(prompt-font);
-    background-color:            transparent;
-    text-color:                  var(foreground-normal);
-}
-
-/*****----- Message -----*****/
+/*****----- Message / System Info Bar -----*****/
 message {
     enabled:                     true;
-    margin:                      var(message-margin);
-    padding:                     var(message-padding);
-    border-radius:               var(message-border-radius);
-    background-color:            var(background-normal);
-    text-color:                  var(foreground-normal);
-}
-textbox {
-    font:                        var(textbox-font);
+    padding:                     0px;
     background-color:            transparent;
-    text-color:                  inherit;
-    vertical-align:              0.5;
-    horizontal-align:            0.5;
+    border:                      1px;
+    border-color:                var(accent-color);
+    border-radius:               0px;
 }
 
-/*****----- Listview -----*****/
+textbox {
+    padding:                     10px;
+    background-color:            var(background-element);
+    text-color:                  var(foreground-normal);
+    vertical-align:              0.5;
+    horizontal-align:            0.5;
+    border-radius:               0px;
+}
+
+/*****----- Listview (Horizontal Row) -----*****/
 listview {
     enabled:                     true;
-    expand:                      false;
     columns:                     5;
     lines:                       1;
     cycle:                       true;
     dynamic:                     true;
     scrollbar:                   false;
     layout:                      vertical;
-    reverse:                     false;
-    fixed-height:                true;
-    fixed-columns:               true;
-
-    spacing:                     var(listview-spacing);
+    spacing:                     15px;
     background-color:            transparent;
     cursor:                      "default";
+    fixed-height:                true;
+    fixed-columns:               true;
 }
 
-/*****----- Elements -----*****/
+/*****----- Elements (True Circle Buttons) -----*****/
 element {
     enabled:                     true;
-    padding:                     var(element-padding);
-    border-radius:               var(element-border-radius);
-    background-color:            var(background-normal);
+    padding:                     23px 0px; /* Top/bottom padding tuned to 80px height */
+    border-radius:               100%;     /* Turns 80x80 square into a perfect circle */
+    background-color:            var(background-element);
     text-color:                  var(foreground-normal);
     cursor:                      pointer;
 }
+
 element-text {
     font:                        var(element-text-font);
     background-color:            transparent;
@@ -125,6 +105,7 @@ element-text {
     vertical-align:              0.5;
     horizontal-align:            0.5;
 }
+
 element selected.normal {
     background-color:            var(background-selected);
     text-color:                  var(foreground-selected);

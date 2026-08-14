@@ -1415,7 +1415,7 @@ manage(Window w, XWindowAttributes *wa)
 	}
 
 	/* nmtui-floating */
-	if (!strcmp(c->name, "gazelle")) {
+	if (!strcmp(c->name, "impala")) {
 		c->isfloating = 1;
 		c->w = 950;
 		c->h = 600;
@@ -1846,78 +1846,80 @@ run(void)
 void
 runautostart(void)
 {
-	char *pathpfx;
-	char *path;
-	char *xdgdatahome;
-	char *home;
-	struct stat sb;
+        char *pathpfx;
+        char *path;
+        char *xdgdatahome;
+        char *home;
+        struct stat sb;
 
-	if ((home = getenv("HOME")) == NULL)
-		/* this is almost impossible */
-		return;
+        if ((home = getenv("HOME")) == NULL)
+                /* this is almost impossible */
+                return;
 
-	/* if $XDG_DATA_HOME is set and not empty, use $XDG_DATA_HOME/dwm,
-	 * otherwise use ~/.local/share/dwm as autostart script directory
-	 */
-	xdgdatahome = getenv("XDG_DATA_HOME");
-	if (xdgdatahome != NULL && *xdgdatahome != '\0') {
-		/* space for path segments, separators and nul */
-		pathpfx = ecalloc(1, strlen(xdgdatahome) + strlen(dwmdir) + 2);
+        /* if $XDG_DATA_HOME is set and not empty, use $XDG_DATA_HOME/dwm,
+         * otherwise use ~/.local/share/dwm as autostart script directory
+         */
+        xdgdatahome = getenv("XDG_DATA_HOME");
+        if (xdgdatahome != NULL && *xdgdatahome != '\0') {
+                /* space for path segments, separators and nul */
+                pathpfx = ecalloc(1, strlen(xdgdatahome) + strlen(dwmdir) + 2);
 
-		if (sprintf(pathpfx, "%s/%s", xdgdatahome, dwmdir) <= 0) {
-			free(pathpfx);
-			return;
-		}
-	} else {
-		/* space for path segments, separators and nul */
-		pathpfx = ecalloc(1, strlen(home) + strlen(localshare)
-		                     + strlen(dwmdir) + 3);
+                if (sprintf(pathpfx, "%s/%s", xdgdatahome, dwmdir) <= 0) {
+                        free(pathpfx);
+                        return;
+                }
+        } else {
+                /* space for path segments, separators and nul */
+                pathpfx = ecalloc(1, strlen(home) + strlen(localshare)
+                                     + strlen(dwmdir) + 3);
 
-		if (sprintf(pathpfx, "%s/%s/%s", home, localshare, dwmdir) < 0) {
-			free(pathpfx);
-			return;
-		}
-	}
+                if (sprintf(pathpfx, "%s/%s/%s", home, localshare, dwmdir) < 0) {
+                        free(pathpfx);
+                        return;
+                }
+        }
 
-	/* check if the autostart script directory exists */
-	if (! (stat(pathpfx, &sb) == 0 && S_ISDIR(sb.st_mode))) {
-		/* the XDG conformant path does not exist or is no directory
-		 * so we try ~/.dwm instead
-		 */
-		char *pathpfx_new = realloc(pathpfx, strlen(home) + strlen(dwmdir) + 3);
-		if(pathpfx_new == NULL) {
-			free(pathpfx);
-			return;
-		}
-		pathpfx = pathpfx_new;
+        /* check if the autostart script directory exists */
+        if (! (stat(pathpfx, &sb) == 0 && S_ISDIR(sb.st_mode))) {
+                /* the XDG conformant path does not exist or is no directory
+                 * so we try ~/.dwm instead
+                 */
+                char *pathpfx_new = realloc(pathpfx, strlen(home) + strlen(dwmdir) + 3);
+                if(pathpfx_new == NULL) {
+                        free(pathpfx);
+                        return;
+                }
+                pathpfx = pathpfx_new;
 
-		if (sprintf(pathpfx, "%s/.%s", home, dwmdir) <= 0) {
-			free(pathpfx);
-			return;
-		}
-	}
+                if (sprintf(pathpfx, "%s/.%s", home, dwmdir) <= 0) {
+                        free(pathpfx);
+                        return;
+                }
+        }
 
-	/* try the blocking script first */
-	path = ecalloc(1, strlen(pathpfx) + strlen(autostartblocksh) + 2);
-	if (sprintf(path, "%s/%s", pathpfx, autostartblocksh) <= 0) {
-		free(path);
-		free(pathpfx);
-	}
+        /* try the blocking script first */
+        path = ecalloc(1, strlen(pathpfx) + strlen(autostartblocksh) + 2);
+        if (sprintf(path, "%s/%s", pathpfx, autostartblocksh) <= 0) {
+                free(path);
+                free(pathpfx);
+        }
 
-	if (access(path, X_OK) == 0)
-		system(path);
+        if (access(path, X_OK) == 0) {
+                if (system(path)) {}
+        }
 
-	/* now the non-blocking script */
-	if (sprintf(path, "%s/%s", pathpfx, autostartsh) <= 0) {
-		free(path);
-		free(pathpfx);
-	}
+        /* now the non-blocking script */
+        if (sprintf(path, "%s/%s", pathpfx, autostartsh) <= 0) {
+                free(path);
+                free(pathpfx);
+        }
 
-	if (access(path, X_OK) == 0)
-		system(strcat(path, " &"));
+        if (access(path, X_OK) == 0) {
+                if (system(strcat(path, " &"))) {}
+        }
 
-	free(pathpfx);
-	free(path);
+        free(pathpfx);
+        free(path);
 }
 
 void
@@ -2042,31 +2044,31 @@ setfocus(Client *c)
 void
 setfullscreen(Client *c, int fullscreen)
 {
-	if (fullscreen && !c->isfullscreen) {
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
-		c->isfullscreen = 1;
-		c->oldstate = c->isfloating;
-		c->oldbw = c->bw;
-		c->bw = 0;
-		c->isfloating = 1;
-		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
-		XRaiseWindow(dpy, c->win);
-        system("polybar-msg cmd hide &");
-	} else if (!fullscreen && c->isfullscreen){
-		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
-			PropModeReplace, (unsigned char*)0, 0);
-		c->isfullscreen = 0;
-		c->isfloating = c->oldstate;
-		c->bw = c->oldbw;
-		c->x = c->oldx;
-		c->y = c->oldy;
-		c->w = c->oldw;
-		c->h = c->oldh;
-		resizeclient(c, c->x, c->y, c->w, c->h);
-		arrange(c->mon);
-        system("polybar-msg cmd show &");
-	}
+        if (fullscreen && !c->isfullscreen) {
+                XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                        PropModeReplace, (unsigned char*)&netatom[NetWMFullscreen], 1);
+                c->isfullscreen = 1;
+                c->oldstate = c->isfloating;
+                c->oldbw = c->bw;
+                c->bw = 0;
+                c->isfloating = 1;
+                resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
+                XRaiseWindow(dpy, c->win);
+                if (system("polybar-msg cmd hide &")) {}
+        } else if (!fullscreen && c->isfullscreen){
+                XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
+                        PropModeReplace, (unsigned char*)0, 0);
+                c->isfullscreen = 0;
+                c->isfloating = c->oldstate;
+                c->bw = c->oldbw;
+                c->x = c->oldx;
+                c->y = c->oldy;
+                c->w = c->oldw;
+                c->h = c->oldh;
+                resizeclient(c, c->x, c->y, c->w, c->h);
+                arrange(c->mon);
+                if (system("polybar-msg cmd show &")) {}
+        }
 }
 
 void
@@ -2353,28 +2355,31 @@ togglebar(const Arg *arg)
 void
 togglefloating(const Arg *arg)
 {
-	if (!selmon->sel)
-		return;
-	if (selmon->sel->isfullscreen) /* no support for fullscreen windows */
-		return;
-	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
-	if (selmon->sel->isfloating) {
-		/* center window when toggling to floating */
-        int w = selmon->sel->mon->ww * 0.5;
-        int h = selmon->sel->mon->wh * 0.6;
-        selmon->sel->w = w;
-        selmon->sel->h = h;
-        selmon->sel->x = selmon->sel->mon->wx + (selmon->sel->mon->ww / 2 - w / 2);
-        selmon->sel->y = selmon->sel->mon->wy + (selmon->sel->mon->wh / 2 - h / 2);
-        XMoveResizeWindow(dpy, selmon->sel->win, selmon->sel->x, selmon->sel->y, w, h);
-	} else {
-		/* save last known float dimensions when going back to tiled */
-		selmon->sel->sfx = selmon->sel->x;
-		selmon->sel->sfy = selmon->sel->y;
-		selmon->sel->sfw = selmon->sel->w;
-		selmon->sel->sfh = selmon->sel->h;
-	}
-	arrange(selmon);
+        Client *c = selmon->sel;
+        if (!c)
+                return;
+        if (c->isfullscreen)
+                return;
+
+        c->isfloating = !c->isfloating;
+        
+        if (c->isfloating) {
+                /* Center the window and resize it when toggling to floating */
+                int w = c->mon->ww * 0.5;
+                int h = c->mon->wh * 0.6;
+                int x = c->mon->wx + (c->mon->ww - w) / 2;
+                int y = c->mon->wy + (c->mon->wh - h) / 2;
+                
+                resizeclient(c, x, y, w, h);
+        } else {
+                /* Save last known float dimensions when going back to tiled */
+                c->sfx = c->x;
+                c->sfy = c->y;
+                c->sfw = c->w;
+                c->sfh = c->h;
+        }
+        
+        arrange(selmon);
 }
 
 void
@@ -3040,7 +3045,7 @@ getparentprocess(pid_t p)
 	if (!(f = fopen(buf, "r")))
 		return 0;
 
-	fscanf(f, "%*u %*s %*c %u", &v);
+	if (fscanf(f, "%*u %*s %*c %u", &v)) {}
 	fclose(f);
 #endif /* __linux__*/
 

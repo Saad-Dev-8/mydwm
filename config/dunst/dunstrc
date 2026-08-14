@@ -2,7 +2,7 @@
     ### Display ###
     monitor = 0
     follow = mouse
-    indicate_hidden = yes
+    indicate_hidden = true
     transparency = 0
     separator_height = 2
     padding = 16
@@ -14,7 +14,7 @@
     origin = top-right
     width = (0, 400)
     height = (0, 100)
-    offset = (20, 30)
+    offset = 20x30
     
     ### Text ###
     font = "JetBrains Mono 10"
@@ -24,11 +24,11 @@
     vertical_alignment = center
     show_age_threshold = 60
     ellipsize = middle
-    ignore_newline = no
+    ignore_newline = false
     stack_duplicates = true
     hide_duplicate_count = false
     markup = full
-    word_wrap = yes
+    wrap_mode = word
     
     ### Icons ###
     icon_position = left
@@ -44,7 +44,7 @@
     always_run_script = true
     title = Dunst
     class = Dunst
-    corner_radius = 8
+    corner_radius = 0
     ignore_dbusclose = false
 
 [urgency_low]

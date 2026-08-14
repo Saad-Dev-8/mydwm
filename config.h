@@ -48,9 +48,10 @@ static const Rule rules[] = {
 	 */
 	/* class              instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
 	// { "Polybar",          NULL,     NULL,           0,         0,          0,           1,        -1 },
-    { "St",               NULL,     NULL,           0,         0,          1,           0,        -1 },
+    	{ "St",               NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ "firefox",          NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "Firefox",          NULL,     NULL,           0,         0,          0,           0,        -1 },
+	{ "firefox-bin",      NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "firefox-esr",      NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "Pcmanfm",          NULL,     NULL,           0,         0,          0,           0,        -1 },
 	{ "Pavucontrol",      NULL,     NULL,           0,         1,          0,           0,        -1 },
@@ -91,7 +92,7 @@ static const int lockfullscreen = 1;
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-    { "[\\]",     dwindle },
+    	{ "[\\]",     dwindle },
 	{ "[]=",      tile },
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
@@ -103,7 +104,7 @@ static const Layout layouts[] = {
 	{ ":::",      gaplessgrid },
 	{ "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
-    { "###",      nrowgrid },
+    	{ "###",      nrowgrid },
 	{ "><>",      NULL },
 	{ NULL,       NULL },
 };
@@ -125,17 +126,17 @@ static const char *windowcmd[]     = { "rofi", "-show", "window", NULL };
 static const char *emojicmd[]      = { "rofi", "-modi", "emoji", "-show", "emoji", NULL };
 static const char *keybindscmd[]   = { "/bin/sh", "-c", "$HOME/Projects/mydwm/scripts/dwm-keybinds.sh", NULL };
 static const char *termcmd[]       = { "st", NULL };
-static const char *nmuicmd[]       = { "st", "-c", "nmtui-floating", "-e", "gazelle", NULL };
+static const char *nmuicmd[]       = { "st", "-c", "nmtui-floating", "-e", "impala", NULL };
 static const char *themecmd[]      = { "/bin/sh", "-c", "$HOME/Projects/mydwm/scripts/theme-switcher.sh", NULL };
-static const char *browsercmd[]    = { "firefox", NULL };
+static const char *browsercmd[]    = { "firefox-bin", NULL };
 static const char *filecmd[]       = { "pcmanfm", NULL };
 static const char *scrcmd[]        = { "flameshot", "gui", NULL };
 static const char *scrfullcmd[]    = { "flameshot", "full", NULL };
-static const char *volupcmd[]      = { "pamixer", "-i", "5", NULL };
-static const char *voldowncmd[]    = { "pamixer", "-d", "5", NULL };
-static const char *voltogcmd[]     = { "pamixer", "-t", NULL };
-static const char *brupcmd[]       = { "brightnessctl", "-d", "amdgpu_bl1", "set", "+5%", NULL };
-static const char *brdowncmd[]     = { "brightnessctl", "-d", "amdgpu_bl1", "set", "5%-", NULL };
+static const char *volupcmd[]      = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "5%+", NULL };
+static const char *voldowncmd[]    = { "wpctl", "set-volume", "-l", "1.0", "@DEFAULT_AUDIO_SINK@", "5%-", NULL };
+static const char *voltogcmd[]     = { "wpctl", "set-mute",   "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
+static const char *brupcmd[]       = { "brightnessctl", "-d", "amdgpu_bl0", "set", "+5%", NULL };
+static const char *brdowncmd[]     = { "brightnessctl", "-d", "amdgpu_bl0", "set", "5%-", NULL };
 static const char *wallcmd[]       = { "/bin/sh", "-c", "feh --randomize --bg-fill ~/Pictures/Wallpapers/*", NULL };
 static const char *lockcmd[]       = { "betterlockscreen", "-l", NULL };
 static const char *powercmd[]      = { "/bin/sh", "-c", "~/.config/rofi/powermenu.sh", NULL };
@@ -152,10 +153,10 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_x,               spawn,          {.v = termcmd } },
 	{ MODKEY,                       XK_r,               spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_w,               spawn,          {.v = windowcmd } },
-    { MODKEY|ShiftMask,             XK_m,               spawn,          {.v = emojicmd } },
-    { MODKEY,                       XK_n,               spawn,          {.v = nmuicmd } },
+    	{ MODKEY|ShiftMask,             XK_m,               spawn,          {.v = emojicmd } },
+    	{ MODKEY,                       XK_n,               spawn,          {.v = nmuicmd } },
 	{ MODKEY|ShiftMask,             XK_t,               spawn,          {.v = themecmd } },
-    { MODKEY,                       XK_slash,           spawn,          {.v = keybindscmd } },
+    	{ MODKEY,                       XK_slash,           spawn,          {.v = keybindscmd } },
 	{ MODKEY,                       XK_b,               spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_e,               spawn,          {.v = filecmd } },
 	{ MODKEY,                       XK_p,               spawn,          {.v = scrcmd } },
@@ -184,7 +185,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_Left,            movestack,      {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_Right,           movestack,      {.i = +1 } },
 	{ MODKEY|ControlMask,           XK_t,               setlayoutsafe,  {.v = &layouts[0]} },
-    { MODKEY,                       XK_h,               setmfact,       {.f = -0.05} },
+    	{ MODKEY,                       XK_h,               setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_l,               setmfact,       {.f = +0.05} },
 	{ MODKEY,                       XK_i,               incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_d,               incnmaster,     {.i = -1 } },
@@ -194,7 +195,7 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_f,               togglefullscr,  {0} },
 
 	/* exit and lock */
-    { MODKEY|ShiftMask,             XK_l,               spawn,          {.v = lockcmd } },
+    	{ MODKEY|ShiftMask,             XK_l,               spawn,          {.v = lockcmd } },
 	{ MODKEY|ShiftMask,             XK_e,               quit,           {0} },
 
 	/* layouts */

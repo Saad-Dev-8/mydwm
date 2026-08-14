@@ -4,7 +4,8 @@ configuration {
   show-icons: true;
   icon-theme: "Papirus";
   display-drun: "  ";
-  display-window: "﩯 ";
+  display-window: "󱂬 ";
   display-combi: "  ";
+  scroll-method: 1;
 }
 @theme "themes/centeredtab-nord.rasi"
