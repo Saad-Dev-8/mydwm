@@ -10,8 +10,9 @@ Super + r                    App Launcher  (rofi)
 Super + b                    Browser   (firefox)
 Super + e                    File Manager   (pcmanfm)
 Super + w                    Window Switcher 󱂬  (rofi)
+Super + v                    Open Clipboard  (rofi-clipboard)
 Super + p                    Screenshot  (flameshot)
-Super + n                    Gazelle Menu 󰒍
+Super + n                    Wi-fi Menu 󰒍
 Super + Shift + p            Fullscreen Screenshot 
 Super + Shift + w            Random Wallpaper 󰸉
 Super + grave                Scratchpad Terminal 
