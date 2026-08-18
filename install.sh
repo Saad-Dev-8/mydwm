@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -u
+IFS=$'\n\t'
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -6,22 +9,88 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
-success() { echo -e "${GREEN}[OK]${NC} $1"; }
-warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-error()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
+SUPPORTS_EMOJI=true
+if [ -z "${TERM:-}" ] || [ "$TERM" = "dumb" ] || [ -n "${CI:-}" ]; then
+    SUPPORTS_EMOJI=false
+fi
 
-# get script directory (mydwm root)
-DWMDIR="$(cd "$(dirname "$0")" && pwd)"
+info() {
+    if [ "$SUPPORTS_EMOJI" = true ]; then
+        echo -e "${BLUE}ℹ️  $1${NC}"
+    else
+        echo -e "${BLUE}[INFO] $1${NC}"
+    fi
+}
+
+success() {
+    if [ "$SUPPORTS_EMOJI" = true ]; then
+        echo -e "${GREEN}✅ $1${NC}"
+    else
+        echo -e "${GREEN}[OK] $1${NC}"
+    fi
+}
+
+warning() {
+    if [ "$SUPPORTS_EMOJI" = true ]; then
+        echo -e "${YELLOW}⚠️  $1${NC}"
+    else
+        echo -e "${YELLOW}[WARN] $1${NC}"
+    fi
+}
+
+error() {
+    if [ "$SUPPORTS_EMOJI" = true ]; then
+        echo -e "${RED}❌ $1${NC}" >&2
+    else
+        echo -e "${RED}[ERROR] $1${NC}" >&2
+    fi
+    exit 1
+}
+
+die() {
+    error "$@"
+}
+
+cleanup() {
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        error "Installation failed with exit code $exit_code"
+    fi
+    exit $exit_code
+}
+
+trap cleanup EXIT
+trap 'error "Installation interrupted by user"; exit 130' INT TERM
+
+DWMDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)" || error "Failed to determine script directory"
+readonly DWMDIR
 CONFIGDIR="$DWMDIR/config"
 
-echo -e "${BLUE}"
-echo "  ╔══════════════════════════════╗"
-echo "  ║       mydwm installer        ║"
-echo "  ╚══════════════════════════════╝"
-echo -e "${NC}"
+print_header() {
+    echo ""
+    echo -e "${BLUE}╔══════════════════════════════╗${NC}"
+    echo -e "${BLUE}║       mydwm installer        ║${NC}"
+    echo -e "${BLUE}║   Enhanced & Production      ║${NC}"
+    echo -e "${BLUE}╚══════════════════════════════╝${NC}"
+    echo ""
+}
 
-# detect distro family
+detect_os() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "macos"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "linux"
+    else
+        echo "unknown"
+    fi
+}
+
+check_command() {
+    if ! command -v "$1" &> /dev/null; then
+        error "Required command not found: $1"
+    fi
+}
+
 detect_distro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
@@ -47,7 +116,6 @@ detect_distro() {
         fi
     fi
 
-    # fallback checks
     if [ -f /etc/arch-release ]; then
         echo "arch"
     elif [ -f /etc/debian_version ]; then
@@ -60,29 +128,45 @@ detect_distro() {
 }
 
 DISTRO=$(detect_distro)
-PRETTY_NAME=$(grep "^PRETTY_NAME" /etc/os-release 2>/dev/null | cut -d= -f2 | tr -d '"')
-info "Detected: ${PRETTY_NAME:-$DISTRO} (family: $DISTRO)"
+PRETTY_NAME=$(grep "^PRETTY_NAME" /etc/os-release 2>/dev/null | cut -d= -f2 | tr -d '"' || echo "$DISTRO")
+info "Detected: ${PRETTY_NAME} (family: $DISTRO)"
 
-# detect xorg or xlibre
+if [ "$DISTRO" = "unknown" ]; then
+    error "Unsupported or unrecognized Linux distribution"
+fi
+
 detect_xserver() {
-    # check if xlibre is installed (fork of xorg)
-    if pacman -Qi xlibre-xserver &>/dev/null || pacman -Qi xlibre &>/dev/null; then
-        echo "xlibre"
-        return
+    if command -v pacman &>/dev/null; then
+        if pacman -Qi xlibre-xserver &>/dev/null 2>&1 || pacman -Qi xlibre &>/dev/null 2>&1; then
+            echo "xlibre"
+            return
+        fi
     fi
 
-    # check if xorg is installed
-    if pacman -Qi xorg-server &>/dev/null || \
-       dpkg -s xserver-xorg &>/dev/null 2>&1 || \
-       rpm -q xorg-x11-server-Xorg &>/dev/null 2>&1; then
-        echo "xorg"
-        return
-    fi
+    case "$DISTRO" in
+        arch)
+            if pacman -Qi xorg-server &>/dev/null 2>&1; then
+                echo "xorg"
+                return
+            fi
+            ;;
+        debian)
+            if dpkg -s xserver-xorg &>/dev/null 2>&1; then
+                echo "xorg"
+                return
+            fi
+            ;;
+        fedora)
+            if rpm -q xorg-x11-server-Xorg &>/dev/null 2>&1; then
+                echo "xorg"
+                return
+            fi
+            ;;
+    esac
 
-    # check running display server via xdpyinfo
-    if [ -n "$DISPLAY" ]; then
+    if [ -n "${DISPLAY:-}" ]; then
         local server
-        server=$(xdpyinfo 2>/dev/null | grep "X\.Org\|XLibre" | head -1)
+        server=$(xdpyinfo 2>/dev/null | grep -E "X\.Org|XLibre" | head -1) || true
         if echo "$server" | grep -qi "xlibre"; then
             echo "xlibre"
             return
@@ -102,7 +186,6 @@ case $XSERVER in
     none)    warning "No X server detected — will install xorg" ;;
 esac
 
-# install xorg if no x server detected
 install_xorg() {
     if [ "$XSERVER" = "none" ]; then
         info "Installing Xorg..."
@@ -115,8 +198,8 @@ install_xorg() {
                     xorg-xsetroot || error "Failed to install Xorg packages on Arch"
                 ;;
             debian)
-                sudo apt update || error "Failed to update apt cache"
-                sudo apt install -y \
+                sudo apt-get update || error "Failed to update apt cache"
+                sudo apt-get install -y \
                     xserver-xorg \
                     xinit \
                     x11-xserver-utils || error "Failed to install Xorg packages on Debian"
@@ -127,6 +210,9 @@ install_xorg() {
                     xorg-x11-xinit \
                     xorg-x11-utils || error "Failed to install Xorg packages on Fedora"
                 ;;
+            *)
+                error "Unsupported distribution for Xorg installation: $DISTRO"
+                ;;
         esac
         success "Xorg installed"
     else
@@ -134,11 +220,9 @@ install_xorg() {
     fi
 }
 
-# install dependencies
 install_deps() {
     info "Installing dependencies..."
 
-    # install xorg if needed
     install_xorg
 
     case $DISTRO in
@@ -168,8 +252,8 @@ install_deps() {
                 firefox || error "Failed to install dependencies on Arch"
             ;;
         debian)
-            sudo apt update || error "Failed to update apt cache"
-            sudo apt install -y \
+            sudo apt-get update || error "Failed to update apt cache"
+            sudo apt-get install -y \
                 build-essential \
                 libx11-dev \
                 libxft-dev \
@@ -223,15 +307,26 @@ install_deps() {
     success "Dependencies installed"
 }
 
-# build and install dwm
+verify_build_environment() {
+    info "Verifying build environment..."
+    check_command make
+    check_command gcc || check_command clang
+    check_command sudo
+    success "Build environment verified"
+}
+
 install_dwm() {
     info "Building dwm..."
+    
+    if [ ! -f "$DWMDIR/config.mk" ] && [ ! -f "$DWMDIR/Makefile" ]; then
+        error "Invalid mydwm directory: $DWMDIR (config.mk or Makefile not found)"
+    fi
+
     cd "$DWMDIR" || error "Failed to change to $DWMDIR"
-    sudo make clean install || error "dwm build failed"
+    sudo make clean install || error "dwm build or installation failed"
     success "dwm installed"
 }
 
-# install config files
 install_configs() {
     info "Installing config files..."
 
@@ -241,7 +336,6 @@ install_configs() {
     mkdir -p ~/.config/rofi || error "Failed to create ~/.config/rofi"
     mkdir -p ~/.config/betterlockscreen || error "Failed to create ~/.config/betterlockscreen"
 
-    # picom
     if [ -d "$CONFIGDIR/picom" ]; then
         cp -r "$CONFIGDIR/picom/"* ~/.config/picom/ || error "Failed to copy picom config"
         success "picom config installed"
@@ -249,7 +343,6 @@ install_configs() {
         error "picom config not found in $CONFIGDIR/picom"
     fi
 
-    # dunst
     if [ -d "$CONFIGDIR/dunst" ]; then
         cp -r "$CONFIGDIR/dunst/"* ~/.config/dunst/ || error "Failed to copy dunst config"
         success "dunst config installed"
@@ -257,17 +350,15 @@ install_configs() {
         error "dunst config not found in $CONFIGDIR/dunst"
     fi
 
-    # polybar
     if [ -d "$CONFIGDIR/polybar" ]; then
         cp -r "$CONFIGDIR/polybar/"* ~/.config/polybar/ || error "Failed to copy polybar config"
         chmod +x ~/.config/polybar/launch.sh 2>/dev/null || warning "Could not make polybar launch.sh executable"
-        chmod +x ~/.config/polybar/scripts/*.sh 2>/dev/null || warning "Could not make polybar scripts executable"
+        find ~/.config/polybar/scripts -name "*.sh" -type f -exec chmod +x {} \; 2>/dev/null || warning "Could not make polybar scripts executable"
         success "polybar config installed"
     else
         error "polybar config not found in $CONFIGDIR/polybar"
     fi
 
-    # rofi
     if [ -d "$CONFIGDIR/rofi" ]; then
         cp -r "$CONFIGDIR/rofi/"* ~/.config/rofi/ || error "Failed to copy rofi config"
         chmod +x ~/.config/rofi/powermenu.sh 2>/dev/null || warning "Could not make rofi powermenu.sh executable"
@@ -276,7 +367,6 @@ install_configs() {
         error "rofi config not found in $CONFIGDIR/rofi"
     fi
 
-    # betterlockscreen
     if [ -d "$CONFIGDIR/betterlockscreen" ]; then
         cp -r "$CONFIGDIR/betterlockscreen/"* ~/.config/betterlockscreen/ || error "Failed to copy betterlockscreen config"
         success "betterlockscreen config installed"
@@ -285,7 +375,6 @@ install_configs() {
     fi
 }
 
-# install autostart script
 install_autostart() {
     info "Installing autostart..."
     mkdir -p ~/.local/share/dwm || error "Failed to create ~/.local/share/dwm"
@@ -298,7 +387,6 @@ install_autostart() {
     fi
 }
 
-# install dwm desktop entry for lightdm
 install_desktop_entry() {
     info "Installing dwm desktop entry..."
     sudo tee /usr/share/xsessions/dwm.desktop > /dev/null << 'EOF'
@@ -314,7 +402,6 @@ EOF
     success "dwm desktop entry installed"
 }
 
-# create wallpapers directory
 setup_wallpapers() {
     if [ ! -d ~/Pictures/Wallpapers ]; then
         mkdir -p ~/Pictures/Wallpapers || error "Failed to create ~/Pictures/Wallpapers"
@@ -324,8 +411,29 @@ setup_wallpapers() {
     fi
 }
 
-main() {
+show_completion_summary() {
     echo ""
+    echo -e "${GREEN}"
+    echo "  ╔══════════════════════════════════════╗"
+    echo "  ║     Installation Complete! ✨       ║"
+    echo "  ╚══════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo ""
+    info "Next steps:"
+    echo "  1. Log out and select 'dwm' from your display manager"
+    echo "  2. Add wallpapers to ~/Pictures/Wallpapers"
+    echo "  3. Customize keybinds in $DWMDIR/config.h"
+    echo ""
+    info "Quick start:"
+    echo "  • Mod+P  - rofi launcher"
+    echo "  • Mod+Return - terminal"
+    echo "  • Mod+Q  - close window"
+    echo ""
+}
+
+main() {
+    print_header
+
     echo "What would you like to install?"
     echo "  1) Everything (recommended)"
     echo "  2) dwm only"
@@ -333,31 +441,35 @@ main() {
     echo "  4) deps only"
     echo ""
     
-    # Validate input
-    while true; do
+    local choice
+    local valid_choice=false
+    
+    while [ "$valid_choice" = false ]; do
         read -rp "Choice [1-4]: " choice
         case $choice in
             1)
+                verify_build_environment
                 install_deps
                 install_dwm
                 install_configs
                 install_autostart
                 install_desktop_entry
                 setup_wallpapers
-                break
+                valid_choice=true
                 ;;
             2)
+                verify_build_environment
                 install_dwm
-                break
+                valid_choice=true
                 ;;
             3)
                 install_configs
                 install_autostart
-                break
+                valid_choice=true
                 ;;
             4)
                 install_deps
-                break
+                valid_choice=true
                 ;;
             *)
                 warning "Invalid choice — please enter 1-4"
@@ -365,16 +477,7 @@ main() {
         esac
     done
 
-    echo ""
-    echo -e "${GREEN}"
-    echo "  ╔══════════════════════════════╗"
-    echo "  ║     installation complete    ║"
-    echo "  ╚══════════════════════════════╝"
-    echo -e "${NC}"
-    echo ""
-    info "Log out and select dwm from your display manager"
-    info "Add wallpapers to ~/Pictures/Wallpapers"
-    echo ""
+    show_completion_summary
 }
 
-main
+main "$@"
