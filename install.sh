@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -68,15 +66,14 @@ info "Detected: ${PRETTY_NAME:-$DISTRO} (family: $DISTRO)"
 # detect xorg or xlibre
 detect_xserver() {
     # check if xlibre is installed (fork of xorg)
-    if pacman -Qi xlibre-xserver &>/dev/null 2>&1 || \
-       pacman -Qi xlibre &>/dev/null 2>&1; then
+    if pacman -Qi xlibre-xserver &>/dev/null || pacman -Qi xlibre &>/dev/null; then
         echo "xlibre"
         return
     fi
 
     # check if xorg is installed
-    if pacman -Qi xorg-server &>/dev/null 2>&1 || \
-       dpkg -l xserver-xorg &>/dev/null 2>&1 || \
+    if pacman -Qi xorg-server &>/dev/null || \
+       dpkg -s xserver-xorg &>/dev/null 2>&1 || \
        rpm -q xorg-x11-server-Xorg &>/dev/null 2>&1; then
         echo "xorg"
         return
@@ -85,11 +82,11 @@ detect_xserver() {
     # check running display server via xdpyinfo
     if [ -n "$DISPLAY" ]; then
         local server
-        server=$(xdpyinfo 2>/dev/null | grep "X.Org\|XLibre" | head -1)
+        server=$(xdpyinfo 2>/dev/null | grep "X\.Org\|XLibre" | head -1)
         if echo "$server" | grep -qi "xlibre"; then
             echo "xlibre"
             return
-        elif echo "$server" | grep -qi "x.org"; then
+        elif echo "$server" | grep -qi "x\.org"; then
             echo "xorg"
             return
         fi
@@ -115,19 +112,20 @@ install_xorg() {
                     xorg-server \
                     xorg-xinit \
                     xorg-xrandr \
-                    xorg-xsetroot
+                    xorg-xsetroot || error "Failed to install Xorg packages on Arch"
                 ;;
             debian)
+                sudo apt update || error "Failed to update apt cache"
                 sudo apt install -y \
                     xserver-xorg \
                     xinit \
-                    x11-xserver-utils
+                    x11-xserver-utils || error "Failed to install Xorg packages on Debian"
                 ;;
             fedora)
                 sudo dnf install -y \
                     xorg-x11-server-Xorg \
                     xorg-x11-xinit \
-                    xorg-x11-utils
+                    xorg-x11-utils || error "Failed to install Xorg packages on Fedora"
                 ;;
         esac
         success "Xorg installed"
@@ -167,10 +165,10 @@ install_deps() {
                 ttf-jetbrains-mono-nerd \
                 betterlockscreen \
                 pcmanfm \
-                firefox
+                firefox || error "Failed to install dependencies on Arch"
             ;;
         debian)
-            sudo apt update
+            sudo apt update || error "Failed to update apt cache"
             sudo apt install -y \
                 build-essential \
                 libx11-dev \
@@ -192,7 +190,7 @@ install_deps() {
                 x11-xserver-utils \
                 fonts-jetbrains-mono \
                 pcmanfm \
-                firefox-esr
+                firefox-esr || error "Failed to install dependencies on Debian"
             ;;
         fedora)
             sudo dnf install -y \
@@ -215,11 +213,10 @@ install_deps() {
                 xclip \
                 xsetroot \
                 pcmanfm \
-                firefox
+                firefox || error "Failed to install dependencies on Fedora"
             ;;
         *)
-            warning "Unknown distro — skipping dependency install"
-            warning "Please install dependencies manually"
+            error "Unknown distro — unsupported system"
             ;;
     esac
 
@@ -229,7 +226,7 @@ install_deps() {
 # build and install dwm
 install_dwm() {
     info "Building dwm..."
-    cd "$DWMDIR"
+    cd "$DWMDIR" || error "Failed to change to $DWMDIR"
     sudo make clean install || error "dwm build failed"
     success "dwm installed"
 }
@@ -238,67 +235,66 @@ install_dwm() {
 install_configs() {
     info "Installing config files..."
 
-    mkdir -p ~/.config/picom
-    mkdir -p ~/.config/dunst
-    mkdir -p ~/.config/polybar
-    mkdir -p ~/.config/rofi
-    mkdir -p ~/.config/betterlockscreen
+    mkdir -p ~/.config/picom || error "Failed to create ~/.config/picom"
+    mkdir -p ~/.config/dunst || error "Failed to create ~/.config/dunst"
+    mkdir -p ~/.config/polybar || error "Failed to create ~/.config/polybar"
+    mkdir -p ~/.config/rofi || error "Failed to create ~/.config/rofi"
+    mkdir -p ~/.config/betterlockscreen || error "Failed to create ~/.config/betterlockscreen"
 
     # picom
     if [ -d "$CONFIGDIR/picom" ]; then
-        cp -r "$CONFIGDIR/picom/"* ~/.config/picom/
+        cp -r "$CONFIGDIR/picom/"* ~/.config/picom/ || error "Failed to copy picom config"
         success "picom config installed"
     else
-        warning "picom config not found in $CONFIGDIR/picom"
+        error "picom config not found in $CONFIGDIR/picom"
     fi
 
     # dunst
     if [ -d "$CONFIGDIR/dunst" ]; then
-        cp -r "$CONFIGDIR/dunst/"* ~/.config/dunst/
+        cp -r "$CONFIGDIR/dunst/"* ~/.config/dunst/ || error "Failed to copy dunst config"
         success "dunst config installed"
     else
-        warning "dunst config not found in $CONFIGDIR/dunst"
+        error "dunst config not found in $CONFIGDIR/dunst"
     fi
 
     # polybar
     if [ -d "$CONFIGDIR/polybar" ]; then
-        cp -r "$CONFIGDIR/polybar/"* ~/.config/polybar/
-        # make sure launch script is executable
-        chmod +x ~/.config/polybar/launch.sh 2>/dev/null || true
-        chmod +x ~/.config/polybar/scripts/*.sh 2>/dev/null || true
+        cp -r "$CONFIGDIR/polybar/"* ~/.config/polybar/ || error "Failed to copy polybar config"
+        chmod +x ~/.config/polybar/launch.sh 2>/dev/null || warning "Could not make polybar launch.sh executable"
+        chmod +x ~/.config/polybar/scripts/*.sh 2>/dev/null || warning "Could not make polybar scripts executable"
         success "polybar config installed"
     else
-        warning "polybar config not found in $CONFIGDIR/polybar"
+        error "polybar config not found in $CONFIGDIR/polybar"
     fi
 
     # rofi
     if [ -d "$CONFIGDIR/rofi" ]; then
-        cp -r "$CONFIGDIR/rofi/"* ~/.config/rofi/
-        chmod +x ~/.config/rofi/powermenu.sh 2>/dev/null || true
+        cp -r "$CONFIGDIR/rofi/"* ~/.config/rofi/ || error "Failed to copy rofi config"
+        chmod +x ~/.config/rofi/powermenu.sh 2>/dev/null || warning "Could not make rofi powermenu.sh executable"
         success "rofi config installed"
     else
-        warning "rofi config not found in $CONFIGDIR/rofi"
+        error "rofi config not found in $CONFIGDIR/rofi"
     fi
 
     # betterlockscreen
     if [ -d "$CONFIGDIR/betterlockscreen" ]; then
-        cp -r "$CONFIGDIR/betterlockscreen/"* ~/.config/betterlockscreen/
+        cp -r "$CONFIGDIR/betterlockscreen/"* ~/.config/betterlockscreen/ || error "Failed to copy betterlockscreen config"
         success "betterlockscreen config installed"
     else
-        warning "betterlockscreen config not found in $CONFIGDIR/betterlockscreen"
+        error "betterlockscreen config not found in $CONFIGDIR/betterlockscreen"
     fi
 }
 
 # install autostart script
 install_autostart() {
     info "Installing autostart..."
-    mkdir -p ~/.local/share/dwm
+    mkdir -p ~/.local/share/dwm || error "Failed to create ~/.local/share/dwm"
     if [ -f "$DWMDIR/scripts/autostart.sh" ]; then
-        cp "$DWMDIR/scripts/autostart.sh" ~/.local/share/dwm/autostart.sh
-        chmod +x ~/.local/share/dwm/autostart.sh
+        cp "$DWMDIR/scripts/autostart.sh" ~/.local/share/dwm/autostart.sh || error "Failed to copy autostart.sh"
+        chmod +x ~/.local/share/dwm/autostart.sh || error "Failed to make autostart.sh executable"
         success "autostart installed"
     else
-        warning "autostart.sh not found in scripts/"
+        error "autostart.sh not found in scripts/"
     fi
 }
 
@@ -314,13 +310,14 @@ Exec=dwm
 Icon=dwm
 Type=XSession
 EOF
+    [ $? -eq 0 ] || error "Failed to install dwm desktop entry"
     success "dwm desktop entry installed"
 }
 
 # create wallpapers directory
 setup_wallpapers() {
     if [ ! -d ~/Pictures/Wallpapers ]; then
-        mkdir -p ~/Pictures/Wallpapers
+        mkdir -p ~/Pictures/Wallpapers || error "Failed to create ~/Pictures/Wallpapers"
         warning "Created ~/Pictures/Wallpapers — add your wallpapers there"
     else
         success "Wallpapers directory exists"
@@ -335,31 +332,38 @@ main() {
     echo "  3) configs only"
     echo "  4) deps only"
     echo ""
-    read -rp "Choice [1-4]: " choice
-
-    case $choice in
-        1)
-            install_deps
-            install_dwm
-            install_configs
-            install_autostart
-            install_desktop_entry
-            setup_wallpapers
-            ;;
-        2)
-            install_dwm
-            ;;
-        3)
-            install_configs
-            install_autostart
-            ;;
-        4)
-            install_deps
-            ;;
-        *)
-            error "Invalid choice"
-            ;;
-    esac
+    
+    # Validate input
+    while true; do
+        read -rp "Choice [1-4]: " choice
+        case $choice in
+            1)
+                install_deps
+                install_dwm
+                install_configs
+                install_autostart
+                install_desktop_entry
+                setup_wallpapers
+                break
+                ;;
+            2)
+                install_dwm
+                break
+                ;;
+            3)
+                install_configs
+                install_autostart
+                break
+                ;;
+            4)
+                install_deps
+                break
+                ;;
+            *)
+                warning "Invalid choice — please enter 1-4"
+                ;;
+        esac
+    done
 
     echo ""
     echo -e "${GREEN}"
