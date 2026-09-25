@@ -21,6 +21,7 @@ dwm with patches for a better experience.
 - ewmhtags
 - systray
 - ipc
+- windowmap
 
 ## Screenshots
 - dwm
